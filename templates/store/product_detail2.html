@@ -150,88 +150,52 @@
         </div>
 
 
-
-        <div class="product-box">
-
-          <!--
-            - PRODUCT FEATURED
-          -->
-
-          <div class="product-featured">
-
-            <h2 class="title">Single Product</h2>
-
-            <div class="showcase-wrapper has-scrollbar">
-
-              <div class="showcase-container">
-
-                <div class="showcase">
-
-                  <div class="showcase-banner">
-                    <img src="{{ single_product.image.url }}" alt="gold"
-                      class="showcase-img">
+        <div class="single-product" style="margin-top: 8px;width: 1080px;position: relative">
+          <div class="row" style="       display: flex;gap: 20px;">
+              <div class="col-6" style="width: 50%;">
+                  <div class="product-image">
+                      <div class="product-image-main">
+                          <img src="{{ single_product.image.url }}" alt="" id="product-main-image">
+                      </div>
+                  </div>
+              </div>
+              <div class="col-6">
+                  <div class="breadcrumb">
+                      <span><a href="#">Home</a></span>
+                      <span><a href="#">Product</a></span>
+                      <span class="active">T-shirt</span>
                   </div>
 
-                  <div class="showcase-content">
-
-                    <div class="showcase-rating">
-                      <ion-icon name="star"></ion-icon>
-                      <ion-icon name="star"></ion-icon>
-                      <ion-icon name="star"></ion-icon>
-                      <ion-icon name="star-outline"></ion-icon>
-                      <ion-icon name="star-outline"></ion-icon>
-                    </div>
-
-                    <a href="#">
-                      <h3 class="showcase-title">{{ single_product.product_name}}</h3>
-                    </a>
-
-                    <p class="showcase-desc">
-                      {{ single_product.description}}
-                    </p>
-
-                    <div class="price-box">
-                      <p class="price">${{ single_product.price}}</p>
-
-                      {% comment %} <del>$1000000.00</del> {% endcomment %}
-                    </div>
-                    {% if single_product.stock <= 0%}
-                     <a style="width: 180px;" style="background-color:red;" class="add-cart-btn">out of stock</a>
-                    {% else  %}
-                      {% if in_cart %}
-                        <a href="#" class="add-cart-btn ">Added to cart</a>
-                        <a href="{% url 'cart' %}" class="add-cart-btn ">View cart</a>
-                      {%else%}
-                      <a style="width: 160px;" href="{% url 'add_cart' single_product.id %}" class="add-cart-btn">add to cart</a>
-                      {% endif %}
-                    {% endif %}
-
-
-                    <div class="showcase-status">
-                      <div class="wrapper">
-                        <p>
-                          already sold: <b>20</b>
-                        </p>
-
-                        <p>
-                          available: <b>40</b>
-                        </p>
+                  <div class="product">
+                      <div class="product-title">
+                          <h2>Half Sleve T-shirt for Men</h2>
+                      </div>
+                      <div class="product-rating">
+                          <span><i class="bx bxs-star"></i></span>
+                          <span><i class="bx bxs-star"></i></span>
+                          <span><i class="bx bxs-star"></i></span>
+                          <span><i class="bx bxs-star"></i></span>
+                          <span><i class="bx bxs-star"></i></span>
+                          <span class="review">(47 Review)</span>
+                      </div>
+                      <div class="product-price">
+                          <span class="offer-price">$99.00</span>
+                          <span class="sale-price">$129.00</span>
                       </div>
 
-                    </div>
+                      <div class="product-details">
+                          <h3>Description</h3>
+                          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos est magnam quibusdam maiores sit perferendis minima cupiditate iusto earum repudiandae maxime vitae nostrum, ea cumque iste ipsa hic commodi tempore.</p>
+                      </div>
+                      <span class="divider"></span>
 
-
+                      <div class="product-btn-group">
+                          <div class="button add-cart"><i class='bx bxs-cart' ></i> Add to Cart</div>
+                      </div>
                   </div>
-
-                </div>
-
               </div>
-
-            </div>
-
           </div>
-
-        </div>
+      </div>
 
       </div>
 
