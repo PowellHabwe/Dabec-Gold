@@ -1,0 +1,267 @@
+{% extends 'base.html' %} 
+{% block content %}
+{% load static %}
+  <main class="container">
+
+    <div class="wrapper">
+      <div class="row">
+          {% csrf_token %}
+          <div class="col-7 col">
+            <h3 class="topborder"><span>Review Order</span></h3>
+            <div class="small-container cart-page" style="margin-top: -3px;">
+              <table>
+                  <tr>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Product total</th>
+                  </tr>
+        
+                  {% for cart_item in cart_items %}
+        
+                    <tr>
+                        <td>
+                            <div class="cart-info">
+                            <a href="{{cart_item.product.get_url }}">
+                              <img src="{{ cart_item.product.image.url }}" alt="imagecart">
+                            </a>
+                                <div>
+                                    <p>                    
+                                      <a href="{{cart_item.product.get_url }}" class="product-name">{{ cart_item.product.product_name }}</a>
+                                    </p>
+                                    <small>Price: ${{ cart_item.product.price }}</small>
+                                    <br>
+                                    <a class="price1"  href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}">
+                                      remove
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                          <span id="quantity">
+                            <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" style="color: hsl(0, 0%, 13%)">
+                              <ion-icon name="remove-outline"></ion-icon>
+                            </a>
+                          </span>
+                          <span id="quantity">
+                            {{ cart_item.quantity }}
+                          </span>
+                          <span id="quantity">
+                            <a href="{% url 'add_cart' cart_item.product.id %}" style="color: hsl(0, 0%, 13%)">     
+                              <ion-icon name="add-outline"></ion-icon>
+                            </a>
+                          </span>           
+                        </td>
+                        <td>${{ cart_item.sub_total }}</td>
+                    </tr>
+                    
+                  {% endfor %}
+              </table>
+        
+              <div class="total-price">
+                  <table>
+                      <tr>
+                          <td>Subtotal</td>
+                          <td>${{total}}</td>
+                      </tr>
+        
+                      <tr>
+                          <td>Shipping</td>
+                          <td>${{tax}}</td>
+                      </tr>  
+                      <tr>
+                          <td>Grand Total</td>
+                          <td>${{ grand_total }}</td>
+                      </tr>
+                      <tr>
+
+                        <td>
+                          <div id="paypal-button-container">
+                          </div>
+                        </td>
+                      </tr>
+
+                  </table>
+
+              </div>
+        
+          </div>
+
+          </div>
+          <div class="col-5 col order">
+            <h3 class="topborder"><span>Billing Address Details</span></h3>
+
+            {% comment %} <div>
+              <h5 class="inline difwidth">Shipping and Handling</h5>
+              <p style="	font-size: 13px;
+              padding: 20px 0;" class="inline alignright center">Free Shipping</p>
+            </div> {% endcomment %}
+            {% comment %} <div><h5>Order Total</h5></div> {% endcomment %}
+  
+            <div>
+              <p class="padleft" style="	font-size: 13px;">
+              {{order.full_name}}
+              </p>
+              <p class="padleft" style="	font-size: 13px;">
+              {{order.full_address}}
+              </p>
+              <p class="padleft" style="	font-size: 13px;">
+              {{order.city}}, {{order.state}}
+              </p>
+              <p class="padleft" style="	font-size: 13px;">
+              {{order.country}}
+              </p>
+              <p class="padleft" style="	font-size: 13px;">
+              {{order.email}}
+              </p>
+              <p class="padleft" style="	font-size: 13px;">
+              {{order.phone}}
+              </p>
+              {% if order.order_note %}
+              <p class="padleft" style="	font-size: 13px;0;">
+              {{order.order_note}}
+              </p>
+              {% endif %}
+
+            </div>
+            {% comment %} 
+              <div><input type="radio" value="cheque" name="payment"><p>Cheque Payment</p></div>
+            {% endcomment %}
+
+          </div>
+      </div>
+    </div>
+  
+  </main>
+
+  <script>
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+    var amount = "{{ grand_total }}"
+    var url = "{% url 'payments' %}"
+    var csrftoken = getCookie('csrftoken');
+    var orderID = "{{order.order_number}}"
+    var payment_method = 'PayPal'
+    var redirect_url = "{% url 'order_complete' %}"
+    function initPayPalButton() {
+      paypal.Buttons({
+        style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'paypal',
+          
+        },
+    
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{"amount":{"currency_code":"USD","value":amount}}]
+          });
+        },
+    
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(orderData) {
+            
+            // Full available details
+            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+    
+            // Show a success message within this page, e.g.
+            const element = document.getElementById('paypal-button-container');
+            element.innerHTML = '';
+            element.innerHTML = '<h3>Thank you for your payment!</h3>';
+    
+            // Or go to another URL:  actions.redirect('thank_you.html');
+            sendData();
+            function sendData(){
+              fetch(url, {
+                method : "POST",
+                headers: {
+                  "Content-type": "application/json",
+                  "X-CSRFToken": csrftoken,
+                },
+                body: JSON.stringify({
+                  orderID: orderID,
+                  transID: orderData.id,
+                  payment_method: payment_method,
+                  status: orderData.status,
+                }),
+              })
+
+              .then((response) => response.json())
+              .then((data) => {
+                window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
+              });
+            }
+          });
+        },
+    
+        onError: function(err) {
+          console.log(err);
+        }
+      }).render('#paypal-button-container');
+    }
+    initPayPalButton();
+    </script>
+{% endblock content %}
+
+
+{% comment %} <div id="smart-button-container">
+  <div style="text-align: center;">
+    <div id="paypal-button-container"></div>
+  </div>
+</div>
+<script src="https://www.paypal.com/sdk/js?client-id=AZG0QXsD5OVVO_ZB1nRWBFCn3qhanfzwclb4MVT92FbH8_pMOBR5F86alMJmnpEh37L8WbVEQ7Ma8kK5&enable-funding=venmo&currency=USD" data-sdk-integration-source="button-factory"></script>
+<script>
+function initPayPalButton() {
+  paypal.Buttons({
+    style: {
+      shape: 'rect',
+      color: 'gold',
+      layout: 'vertical',
+      label: 'paypal',
+      
+    },
+
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{"amount":{"currency_code":"USD","value":1}}]
+      });
+    },
+
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(orderData) {
+        
+        // Full available details
+        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+
+        // Show a success message within this page, e.g.
+        const element = document.getElementById('paypal-button-container');
+        element.innerHTML = '';
+        element.innerHTML = '<h3>Thank you for your payment!</h3>';
+
+        // Or go to another URL:  actions.redirect('thank_you.html');
+        
+      });
+    },
+
+    onError: function(err) {
+      console.log(err);
+    }
+  }).render('#paypal-button-container');
+}
+initPayPalButton();
+</script> {% endcomment %}

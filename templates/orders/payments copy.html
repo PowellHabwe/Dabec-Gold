@@ -1,0 +1,282 @@
+{% extends 'base.html' %} 
+{% block content %}
+{% load static %}
+<main class="container">
+
+    <div class="item-flex">
+
+      <!--
+       - checkout section
+      -->
+      <section class="checkout">
+
+		<button class="method">
+			<ion-icon name="logo-paypal"></ion-icon>
+
+			<span>PayPal</span>
+
+			<ion-icon class="checkmark" name="checkmark-circle-outline"></ion-icon>
+		</button>
+        <div class="payment-form">
+
+			<div class="payment-method">
+  
+				<h2 class="section-heading">Billing Address</h2>
+				<p>{{ order.full_name }}</p>
+				<p>{{ order.full_address }}</p>
+				<p class="card-text mb-0">{{order.city}}, {{order.state}}</p>
+				<p class="card-text mb-0">{{order.country}}</p>
+				<p class="card-text mb-0">{{order.email}}</p>
+				<p class="card-text mb-0">{{order.phone}}</p>
+				{% if order.order_note %}
+				<b>Order Note: </b> {{order.order_note}}
+				{% endif %}
+
+			</div>
+
+		</div>
+        <div class="payment-form">
+
+			<h2 class="section-heading">Review Products</h2>
+            {% for cart_item in cart_items %}
+
+              <div class="product-card">
+
+                <div class="card">
+
+                  <div class="img-box">
+                    <img src="{{ cart_item.product.image.url }}" alt="cartimg" width="80px" class="product-img">
+                  </div>
+
+                  <div class="detail">
+
+                    <a href="{{cart_item.product.get_url }}" class="product-name">{{ cart_item.product.product_name }}</a>
+
+                    <div class="wrapper">
+
+                      <div class="product-qty">
+                        <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}">
+                          remove<ion-icon name="remove-outline"></ion-icon>
+                      </a>
+
+                        <span id="quantity">{{ cart_item.quantity }}</span>
+
+                        <a href="{% url 'add_cart' cart_item.product.id %}">     
+                            add<ion-icon name="add-outline"></ion-icon>
+                        </a>
+                      </div>
+
+
+                      <div class="price">
+                        $<span id="price">{{ cart_item.sub_total }}</span>
+                      </div>
+
+                      <div class="price">
+                        each$<span id="price">{{ cart_item.product.price }}</span>
+                      </div>
+
+                      <a class="price" href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}">
+                        <span id="price">remove</span>
+                      </a>
+
+                    </div>
+
+                  </div>
+
+                  <button class="product-close-btn">
+                    <ion-icon name="close-outline"></ion-icon>
+                  </button>
+
+                </div>
+
+              </div>
+
+            {% endfor %}
+
+
+
+        </div>
+
+        <button class="btn btn-primary">
+          <b>Pay</b> $ <span id="payAmount">2.15</span>
+        </button>
+
+      </section>
+
+
+      <!--
+        - cart section
+      -->
+      <section class="cart">
+     
+        <div class="cart-item-box">
+
+        <h2 class="section-heading">Order Summery</h2> 
+
+        </div>
+
+        <div class="wrapper">
+
+          <div class="amount">
+
+            <div class="tax">
+              <span>Shipping</span> <span>$ <span id="tax">{{tax}}</span></span>
+            </div>
+
+            <div class="total">
+              <span>GrandTotal</span> <span>$ <span id="total">{{ grand_total }}</span></span>
+            </div>
+
+          </div>
+
+		  <div class="discount-token">
+
+            <div class="wrapper-flex">
+
+              <div style="text-align: center;">
+                <div id="paypal-button-container"></div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+    var amount = "{{ grand_total }}"
+    var url = "{% url 'payments' %}"
+    var csrftoken = getCookie('csrftoken');
+    var orderID = "{{order.order_number}}"
+    var payment_method = 'PayPal'
+    var redirect_url = "{% url 'order_complete' %}"
+    function initPayPalButton() {
+      paypal.Buttons({
+        style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'paypal',
+          
+        },
+    
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{"amount":{"currency_code":"USD","value":amount}}]
+          });
+        },
+    
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(orderData) {
+            
+            // Full available details
+            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+    
+            // Show a success message within this page, e.g.
+            const element = document.getElementById('paypal-button-container');
+            element.innerHTML = '';
+            element.innerHTML = '<h3>Thank you for your payment!</h3>';
+    
+            // Or go to another URL:  actions.redirect('thank_you.html');
+            sendData();
+            function sendData(){
+              fetch(url, {
+                method : "POST",
+                headers: {
+                  "Content-type": "application/json",
+                  "X-CSRFToken": csrftoken,
+                },
+                body: JSON.stringify({
+                  orderID: orderID,
+                  transID: orderData.id,
+                  payment_method: payment_method,
+                  status: orderData.status,
+                }),
+              })
+
+              .then((response) => response.json())
+              .then((data) => {
+                window.location.href = redirect_url + '?order_number='+data.order_number+'&payment_id='+data.transID;
+              });
+            }
+          });
+        },
+    
+        onError: function(err) {
+          console.log(err);
+        }
+      }).render('#paypal-button-container');
+    }
+    initPayPalButton();
+    </script>
+{% endblock content %}
+
+
+{% comment %} <div id="smart-button-container">
+  <div style="text-align: center;">
+    <div id="paypal-button-container"></div>
+  </div>
+</div>
+<script src="https://www.paypal.com/sdk/js?client-id=AZG0QXsD5OVVO_ZB1nRWBFCn3qhanfzwclb4MVT92FbH8_pMOBR5F86alMJmnpEh37L8WbVEQ7Ma8kK5&enable-funding=venmo&currency=USD" data-sdk-integration-source="button-factory"></script>
+<script>
+function initPayPalButton() {
+  paypal.Buttons({
+    style: {
+      shape: 'rect',
+      color: 'gold',
+      layout: 'vertical',
+      label: 'paypal',
+      
+    },
+
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{"amount":{"currency_code":"USD","value":1}}]
+      });
+    },
+
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(orderData) {
+        
+        // Full available details
+        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+
+        // Show a success message within this page, e.g.
+        const element = document.getElementById('paypal-button-container');
+        element.innerHTML = '';
+        element.innerHTML = '<h3>Thank you for your payment!</h3>';
+
+        // Or go to another URL:  actions.redirect('thank_you.html');
+        
+      });
+    },
+
+    onError: function(err) {
+      console.log(err);
+    }
+  }).render('#paypal-button-container');
+}
+initPayPalButton();
+</script> {% endcomment %}

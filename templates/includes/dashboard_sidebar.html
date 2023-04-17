@@ -1,0 +1,60 @@
+
+			<!--
+            - DASHBOARD
+          -->
+
+          <div class="service">
+
+            <h2 class="title">Navigation</h2>
+
+            <div class="service-container">
+
+              <a href="{% url 'dashboard' %}" class="service-item">
+
+                <div class="service-content">
+
+                  <h3 class="service-title">View My Dashboard</h3>
+                  <p class="service-desc" >{{user.email}}</p>
+
+                </div>
+
+              </a>
+
+              <a href="{% url 'my_orders' %}" class="service-item">
+
+                <div class="service-content">
+
+                  <h3 class="service-title">View My Orders</h3>
+                  {% comment %} <p class="service-desc" >My Orders</p> {% endcomment %}
+
+                </div>
+
+              </a>
+
+              <a href="{% url 'change_password' %}" class="service-item">
+
+                <div class="service-content">
+
+                  <h3 class="service-title">Change App Password</h3>
+                  {% comment %} <p class="service-desc" >Change Password</p> {% endcomment %}
+
+                </div>
+
+              </a>
+
+              <a href="{% url 'logout' %}" class="service-item">
+
+                <div class="service-content">
+
+                  <h3 class="service-title">Logout</h3>
+				  {% comment %} <p class="service-desc" >Logout</p> {% endcomment %}
+
+
+                </div>
+
+              </a>
+
+            </div>
+
+          </div>
+

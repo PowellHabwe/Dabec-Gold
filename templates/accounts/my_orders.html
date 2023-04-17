@@ -1,0 +1,89 @@
+{% extends 'base.html' %} 
+{% block content %}
+{% load static %}
+<main class="container">
+
+    <div class="small-container cart-page">
+		{% include 'includes/alerts.html' %}
+
+        <table>
+            <tr>
+                <th>Order #</th>
+                <th>Billing Name</th>
+                <th>Order Total</th>
+                <th>Date</th>
+            </tr>
+			{% for order in orders %}
+
+            <tr>
+                <td>
+                    <div class="cart-info">
+                        <div>
+                            <p><a href="{% url 'order_detail' order.order_number %}">{{order.order_number}}</a></p>
+                        </div>
+                    </div>
+                </td>
+                <td style="font-size:15px;">{{order.full_name}}</td>
+                <td style="font-size:15px;">${{order.order_total}}</td>
+				<td style="font-size:15px;">{{order.created_at}}</td>
+
+            </tr>
+
+			{% endfor %}
+
+        </table>
+    </div>
+</main>
+
+{% endblock %}
+
+{% comment %} <section class="section-conten padding-y bg">
+
+	{% include 'includes/alerts.html' %}
+	<div class="container">
+		<div class="row">
+		{% include 'includes/dashboard_sidebar.html' %}
+		<main class="col-md-9">
+			<article class="card">
+			<header class="card-header">
+				<strong class="d-inline-block mr-3">Your order history</strong>
+
+			</header>
+			<div class="card-body">
+				<div class="row">
+				<div class="col-md-12">
+					<table class="table table-hover">
+					<thead>
+						<tr>
+						<th scope="col">Order #</th>
+						<th scope="col">Billing Name</th>
+						<th scope="col">Phone</th>
+						<th scope="col">Order Total</th>
+								<th scope="col">Date</th>
+						</tr>
+					</thead>
+					<tbody>
+							{% for order in orders %}
+						<tr>
+						<th scope="row"><a href="{% url 'order_detail' order.order_number %}">{{order.order_number}}</a></th>
+						<td>{{order.full_name}}</td>
+						<td>{{order.phone}}</td>
+						<td>${{order.order_total}}</td>
+								<td>{{order.created_at}}</td>
+						</tr>
+					{% endfor %}
+
+					</tbody>
+					</table>
+				</div>
+
+				</div> <!-- row.// -->
+			</div> <!-- card-body .// -->
+
+			</article> <!-- order-group.// -->
+		</main>
+	</div> <!-- row.// -->
+	</div>
+
+
+</section>  {% endcomment %}
