@@ -1,12 +1,12 @@
 # Dabec-Gold-and-Real-Estate
-Developed on Ubuntu version 20.04
+Developed on Ubuntu 20.04.
 
-An e-commerce website for selling gold and other products developed using Django version 3
+Django version 3 was used to create an e-commerce website for selling gold and other things.
 
-Incorporates every functionality found in an e-commerce website in addition to custom tracking numbers after purchases.
+Includes all of the features available on an e-commerce website, as well as custom tracking numbers following sales.
 
-Every member has a dashboard to view his or her purchases.
+Every member has a dashboard where they can view their purchases.
 
-Create a virtual environment and install dependencies from the requirements file
+Create a virtual environment and install the requirements file's dependencies.
 
-Run the file,make migrations and create a superuser to access the admin dashboard
+Run the file, perform migrations, and establish a superuser account to gain access to the admin dashboard.
